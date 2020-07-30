@@ -1,0 +1,37 @@
+{% extends "chat/base.html" %}
+
+{% comment %} header {% endcomment %}
+{% block header %}
+    <h3 class="masthead-brand">Room</h3>
+{% endblock header %}
+
+{% comment %} body {% endcomment %}
+{% block content %}
+<script>
+function myFunction(message) {
+    console.log(message)
+    {% comment %} var inputValue = document.getElementById("inputValue").value
+    var link = document.getElementById("roomName")
+    link.action = message+"/" {% endcomment %}
+} 
+
+
+{% comment %} changeRoom.action=roomName.value {% endcomment %}
+</script>
+
+
+<main role="main" class="inner cover">
+    <h1 class="cover-heading">Room</h1>
+    <form action="{% url 'chat-register'  %}" id ="roomName" class='mt-3'>
+        <div class="form-group">   
+            <input class="form-control" id="inputValue" aria-describedby="emailHelp" placeholder="Enter Room" required>
+
+            <input onclick='myFunction("lobby")' type="submit"  class="btn btn-dark mt-3" value="Lobby"/>
+            <input onclick='myFunction("eneral")' type="submit"  class="btn btn-dark mt-3" value="General"/>
+
+        </div>
+    </form>
+
+
+</main>
+{% endblock content %}
