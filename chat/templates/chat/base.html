@@ -14,14 +14,9 @@
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
         integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
-
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <!-- Favicons -->
-    <link rel="apple-touch-icon" href="/docs/4.5/assets/img/favicons/apple-touch-icon.png" sizes="180x180">
-    <link rel="icon" href="/docs/4.5/assets/img/favicons/favicon-32x32.png" sizes="32x32" type="image/png">
-    <link rel="icon" href="/docs/4.5/assets/img/favicons/favicon-16x16.png" sizes="16x16" type="image/png">
-    <link rel="manifest" href="/docs/4.5/assets/img/favicons/manifest.json">
-    <link rel="mask-icon" href="/docs/4.5/assets/img/favicons/safari-pinned-tab.svg" color="#563d7c">
-    <link rel="icon" href="/docs/4.5/assets/img/favicons/favicon.ico">
+
     <meta name="msapplication-config" content="/docs/4.5/assets/img/favicons/browserconfig.xml">
     <meta name="theme-color" content="#563d7c">
 
@@ -47,25 +42,38 @@
 </head>
 
 <body class="text-center">
-    <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+    <div class="cover-container d-flex w-50 h-100 p-3 mx-auto flex-column">
         <header class="masthead mb-auto">
             <div class="inner">
-                {% block header %}
-                    
-                {% endblock header %}
+                <h3 class="masthead-brand" >Room</h3>
                 
                 <nav class="nav nav-masthead justify-content-center">
                     <a class="nav-link active" href="{% url 'chat-home' %}">Home</a>
                     <a class="nav-link disabled" href="#">Features</a>
                     <a class="nav-link disabled" href="#">About</a>
                     <a class="nav-link disabled" href="#">Git</a>
+                    {% if user.is_authenticated %}
+                        <a class="nav-link btn-outline-warning ml-5 op" href={% url 'user-logout' %} style="color: orange">Logout</a>
+                        {% comment %} <a class="nav-link" href={% url 'user-register' %} style="color: orange">Sign-Up</a> {% endcomment %}
+                    {% else %}
+                        <a class="nav-link btn-outline-warning ml-5" href={% url 'user-login' %} style="color: orange">Login</a>
+                        <a class="nav-link" href={% url 'user-register' %} style="color: orange">Sign-Up</a>
+                    {% endif %}
                 </nav>
             </div>
         </header>
 
-        {% block content %}{% endblock content %}
+        
+        {% if messages %}            
+            {% for message in messages %}
+                <div class = "alert alert-{{message.tags}}">{{message}}</div>
+            {% endfor %}
+        {% endif %}
+     
 
-        <footer class="mastfoot mt-auto">
+
+        {% block content %}{% endblock content %}
+        <footer class="mastfoot border-top mt-auto">
             <div class="inner">
                 <p>ChatApp <a href="https://getbootstrap.com/">Bootstrap</a>, by <a
                         href="https://twitter.com/mdo">@mdo</a>.</p>

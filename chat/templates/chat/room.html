@@ -1,21 +1,29 @@
 <!-- chat/templates/chat/room.html -->
 {% extends 'chat/base.html' %}
 
-
-{% block header %}
-    <h3 class="masthead-brand">Room</h3>
-{% endblock header %}
-
-
 {% block content %}
-<h3 class="masthead-brand mb-3">Room</h3>
-<textarea class="form-control disabled" id="chat-log" cols="100" rows="20"></textarea><br>
-    <input class="form-control" id="chat-message-input" type="text" size="100"><br>
-    <input class="form-control" id="chat-message-submit" type="button" value="Send">
+    <h3 class="masthead-brand mb-3">Room</h3>
+
+    <textarea class="form-control disabled" id="chat-log" cols="100" rows="20"></textarea><br>
+    <div class="chatPlacement">
+        <form class="form-group" method="POST" id="non-refresh-submit">
+            {% csrf_token %}
+            {{form}}
+            <button class="btn btn-outline-warning" id="chat-message-submit" type="submit" >Send</butoon>
+        </form>
+    </div>
+    
+
+        {% comment %} <form method="POST">
+        {% csrf_token %}
+        {{form}}
+  
+        
+    </form> {% endcomment %}
 
     {% comment %} convert room_name to a safe json  {% endcomment %}
     {{ room_name|json_script:"room-name" }}
-
+    {{ username|json_script:"user-name" }}
 
     <script>
         {% comment %} get room-name and create a websocket to talk to  {% endcomment %}
@@ -27,33 +35,58 @@
             + roomName
             + '/'
         );
-
+    
         chatSocket.onmessage = function(e) {
+            const userName = JSON.parse(document.getElementById('user-name').textContent);
             const data = JSON.parse(e.data);
-        
-            document.querySelector('#chat-log').value += (data.user+ data.message + '\n');
+            document.querySelector('#chat-log').value += (data.username+": "+ data.message + '\n');
         };
 
         chatSocket.onclose = function(e) {
-
             console.error('Chat socket closed unexpectedly');
         };
 
-        document.querySelector('#chat-message-input').focus();
+        {% comment %} document.querySelector('#chat-message-input').focus();
         document.querySelector('#chat-message-input').onkeyup = function(e) {
             if (e.keyCode === 13) {  // enter, return
                 document.querySelector('#chat-message-submit').click();
             }
-        };
+        }; {% endcomment %}
 
-        document.querySelector('#chat-message-submit').onclick = function(e) {
+        document.getElementById('chat-message-submit').onclick = function(e) {
             const messageInputDom = document.querySelector('#chat-message-input');
             const message = messageInputDom.value;
+            const userName = JSON.parse(document.getElementById('user-name').textContent);
+
             chatSocket.send(JSON.stringify({
+                'username': userName,
                 'message': message
             }));
-            messageInputDom.value = '';
+            
         };
+
+
+
+        $(function() {
+        $("#non-refresh-submit").submit(function(event) {
+            // Stop form from submitting normally
+            event.preventDefault();
+            var friendForm = $(this);
+            // Send the data using post
+            var posting = $.post( friendForm.attr('action'), friendForm.serialize() );
+            // if success:
+            posting.done(function(data) {
+                const messageInputDom = document.querySelector('#chat-message-input');
+                const message = messageInputDom.value;
+                messageInputDom.value = '';
+            });
+            // if failure:
+            posting.fail(function(data) {
+                // 4xx or 5xx response, alert user about failure
+            });
+
+        });
+});
     </script>
 {% endblock content %}
     {% comment %} text area stuff  {% endcomment %}

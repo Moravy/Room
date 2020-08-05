@@ -1,0 +1,23 @@
+{% extends "chat/base.html" %}
+{% comment %} Login Page {% endcomment %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class= "w-50 mx-auto">
+    <form method="POST">
+        {% csrf_token %}
+        <fieldset class="form-group   justify-content-center">
+            <legend class = "border-bottom mb-4"> Login </legend>
+            {{form|crispy}}
+            <div class="form-group mt-5 ">
+                <button type="submit" class="btn btn-outline-warning">submit</button>
+            </div> 
+
+            <div class="border-top pt-3">
+                <small  class="text-muted">Already have an? <a class="ml-2 text-warning" href="{% url 'user-register' %}">Sign Up</a></small>
+            </div>
+        </fieldset>
+
+    </form>
+</div>
+
+{% endblock content %}

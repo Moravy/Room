@@ -1,22 +1,20 @@
 from django.shortcuts import render, redirect
-from .form import userForm
+from .form import messagesForm
 from django.urls import reverse
+from django.contrib.auth.decorators import login_required
+from .models import Chat
+from django.contrib.auth.models import User
 # Create your views here.
+# add userdatabase in model
 
 
 def home(request):
-    if request.method == 'POST':
-        print("something")
-        form = userForm(request.POST)
-        if form.is_valid():
-            userName = form.cleaned_data["userName"]
 
-            return redirect('chat-register', username=userName)
+    content = {
+        "chats": Chat.objects.all()
+    }
 
-        # room(request, room)
-    else:
-        form = userForm()
-    return render(request, "chat/home.html", {"form": form})
+    return render(request, "chat/home.html", content)
 
 
 def about(request):
@@ -30,18 +28,32 @@ def register(request, username):
     return redirect('chat-lobby')
 
 
+@login_required
 def room(request, room_name):
-    print(room_name)
+
     return render(request, 'chat/room.html', {
         'room_name': room_name})
 
 
-def lobby(request,):
-    return render(request, 'chat/room.html', {'room_name': "lobby"})
+@login_required
+def lobby(request):
+    if request.method == "POST":
+        print("********WORKING*******")
+        form = messagesForm(request.POST)
+        if form.is_valid():
+            message = form.cleaned_data["messages"]
+            print(message)
+            newChat = newChat = Chat(message=message, user=request.user)
+            newChat.save()
+    else:
+        form = messagesForm()
+    return render(request, 'chat/room.html', {'form': form, "chats": Chat.objects.all(), 'room_name': "lobby", 'username': request.user.username})
 
 
+@ login_required
 def general(request):
     return render(request, 'chat/room.html', {'room_name': "general"})
+
 # posts = [
 #     {
 #         'name': 'Jane doe',
